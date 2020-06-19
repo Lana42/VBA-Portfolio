@@ -1,0 +1,156 @@
+Git Hub simple reformatting
+
+Stored: PERESONNAL.xlsb
+
+Description: This set of macros do small reformatting tasks.
+-	fixDate  - subroutine - loops through the header (first row) and looks for the word date and reformats the column to a short date. 
+-	fixTime – subroutine - loops through the header (first row) and looks for the word time and reformats the column to a time format.
+-	fixDateComplex  - subroutine - loops through the header row and looks for words or parts of words in an array and reformats the column to a short date.
+-	colfit – subroutine - autofits all columns. Loops through each column that contains data, if it is greater that 18 characters, the column shortens to 18 characters
+-	removeEmptyColumns – subroutine - goes backwards through the columns with data, if a header is empty, the cells are checked to the last row with data. If it is empty, the entire column is empty.
+-	Trim – subroutine - trims all cells in active column to the last row with data
+-	trimAll – subroutine - goes through each column with data and trims each cell to the last row with data. This macro does not always run, sometimes need repeat 
+-	getComment – function – gets the comment from a cell.
+
+
+The comment code shows the 2 types of loops, for and foreach.
+
+
+Public Sub fixDates()
+Dim lCol As Long
+'Dim colNum As Long
+Dim colRng As Range
+Dim cell As Variant
+
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+Set colRng = Range(Cells(1, 1), Cells(1, lCol))
+
+For Each cell In colRng
+    If cell Like "*Date*" Or cell Like "*date*" Then
+        cell.EntireColumn.NumberFormat = "mm/dd/yyyy"
+    End If
+Next cell
+
+'For colNum = 1 To lCol
+'    If Cells(1, colNum).Value Like "*Date*" Or Cells(1, colNum).Value Like "*date*" Then
+'        Columns(colNum).NumberFormat = "mm/dd/yyyy"
+'    End If
+'Next colNum
+
+End Sub
+
+
+Public Sub fixTimes()
+Dim lCol As Long
+'Dim colNum As Long
+Dim colRng As Range
+Dim cell As Variant
+
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+Set colRng = Range(Cells(1, 1), Cells(1, lCol))
+
+For Each cell In colRng
+    If cell Like "*Time*" Or cell Like "*time*" Then
+        cell.EntireColumn.NumberFormat = "hh:mm"
+    End If
+Next cell
+
+'For colNum = 1 To lCol
+'    If Cells(1, colNum).Value Like "*Time*" Or Cells(1, colNum).Value Like "*time*" Then
+'        Columns(colNum).NumberFormat = "hh:mm"
+'    End If
+'Next colNum
+
+End Sub
+
+
+Public Sub fixDatesComplex()
+Dim lCol As Long
+Dim isInArray As Boolean
+Dim outerHeader As Variant
+Dim innerHeader As Variant
+Dim headerArr1 As Variant
+Dim headerArr2 As Range
+Dim header As String
+
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+headerArr1 = Array("dat", "purchdt", "holiday", "vacastart", "vacaend")
+Set headerArr2 = Range(Cells(1, 1), Cells(1, lCol))
+
+For Each outerHeader In headerArr2
+    isInArray = False
+
+    header = Replace(outerHeader, " ", "")
+    header = Replace(header, "_", "")
+    header = Replace(header, "-", "")
+    
+    For Each innerHeader In headerArr1
+        If InStr(LCase(header), innerHeader) Then
+            isInArray = True
+            Exit For
+        End If
+    Next innerHeader
+    
+    If isInArray = True Then
+        outerHeader.EntireColumn.NumberFormat = "mm/dd/yyyy"
+    End If
+Next outerHeader
+
+End Sub
+
+
+Public Sub fixColWidth()
+Dim lCol As Long
+Dim colRng As Range
+Dim cell As Variant
+
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+Cells.EntireColumn.AutoFit
+Set colRng = Range(Cells(1, 1), Cells(1, lCol))
+
+For Each cell In colRng
+    If cell.ColumnWidth > 18 Then
+        cell.EntireColumn.ColumnWidth = 18
+    End If
+Next cell
+
+End Sub
+
+
+Public Sub removeEmptyColumns()
+Dim lCol As Long
+Dim lRow As Long
+Dim colNum As Long
+Dim anyData As Boolean
+Dim rowRng As Range
+Dim cell As Variant
+
+lRow = Cells(Rows.Count, "A").End(xlUp).Row
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+
+For colNum = lCol To 1 Step -1
+    If Cells(1, colNum).Value = "" Then
+        anyData = False
+        Set rowRng = Range(Cells(1, colNum), Cells(lRow, colNum))
+        For Each cell In rowRng
+            If cell <> "" Then
+                 anyData = True
+                Exit For
+            End If
+        Next cell
+
+        If anyData = False Then
+            Columns(colNum).EntireColumn.Delete
+        End If
+    End If
+Next colNum
+
+End Sub
+
+
+Public Function getComment(cellRng As Range) As String
+On Error Resume Next
+getComment = cellRng.Comment.Text
+
+End Function
+
