@@ -1,0 +1,255 @@
+Simple List Concatenation
+
+Stored: PERESONNAL.xlsb
+
+Description: This set of macros is used to make concatenated list from a single column of data.
+-   specialConcatValuesOnly  – subroutine – places a single space between values
+-   specialConcatCommas  – subroutine – places a comma and space between values
+-   specialConcatSingleQuotes – subroutine – places a value in single quotes and separates the value from the list with a comma
+-   specialConcatDoubleQuotes – subroutine – place a value in double quotes and separates the value from the list with a comma
+-   specialConcatCommas2 – subroutine – adds error handling 
+-   specialConcatSwitchingDatatypes – subroutine – adds single quotes to strings and nothing to a number value in a comma separated list
+-   specialConcatMultiColumns – subroutine – concatenation value pairs in two lists
+-   specialConcatMultiColumnsFun – function – same as specialConcatMultiColumns but as a function
+
+
+Public Sub specialConcatValuesOnly()
+Dim lRow As Long
+Dim lCol As Long
+Dim concatCol As Long
+Dim concatStr As String
+Dim concatRng As Range
+Dim concatValue As Variant
+
+concatCol = ActiveCell.Column
+
+lRow = Cells(Rows.Count, concatCol).End(xlUp).Row
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+Set concatRng = Range(Cells(2, concatCol), Cells(lRow, concatCol))
+
+concatStr = ""
+For Each concatValue In concatRng
+    concatStr = concatStr & concatValue & " "
+Next concatValue
+
+concatStr = Left(concatStr, (Len(concatStr) - 1))
+
+Cells(1, lCol + 1).Value = concatStr
+
+End Sub
+
+
+Public Sub specialConcatCommas()
+Dim lRow As Long
+Dim lCol As Long
+Dim concatCol As Long
+Dim concatStr As String
+Dim concatRng As Range
+Dim concatValue As Variant
+
+concatCol = ActiveCell.Column
+
+lRow = Cells(Rows.Count, concatCol).End(xlUp).Row
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+Set concatRng = Range(Cells(2, concatCol), Cells(lRow, concatCol))
+
+concatStr = ""
+For Each concatValue In concatRng
+    concatStr = concatStr & concatValue & ", "
+Next concatValue
+
+concatStr = Left(concatStr, (Len(concatStr) - 2))
+
+Cells(1, lCol + 1).Value = concatStr
+
+End Sub
+
+
+Public Sub specialConcatSingleQuotes()
+Dim lRow As Long
+Dim lCol As Long
+Dim concatCol As Long
+Dim concatStr As String
+Dim concatRng As Range
+Dim concatValue As Variant
+
+concatCol = ActiveCell.Column
+
+lRow = Cells(Rows.Count, concatCol).End(xlUp).Row
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+Set concatRng = Range(Cells(2, concatCol), Cells(lRow, concatCol))
+
+concatStr = ""
+For Each concatValue In concatRng
+    concatStr = concatStr & Chr(39) & concatValue & Chr(39) & ", "
+Next concatValue
+
+concatStr = Left(concatStr, (Len(concatStr) - 2))
+
+Cells(1, lCol + 1).Value = concatStr
+
+End Sub
+
+
+Public Sub specialConcatDoubleQuotes()
+Dim lRow As Long
+Dim lCol As Long
+Dim concatCol As Long
+Dim concatStr As String
+Dim concatRng As Range
+Dim concatValue As Variant
+
+concatCol = ActiveCell.Column
+
+lRow = Cells(Rows.Count, concatCol).End(xlUp).Row
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+Set concatRng = Range(Cells(2, concatCol), Cells(lRow, concatCol))
+
+concatStr = ""
+For Each concatValue In concatRng
+    concatStr = concatStr & Chr(34) & concatValue & Chr(34) & ", "
+Next concatValue
+
+concatStr = Left(concatStr, (Len(concatStr) - 2))
+
+Cells(1, lCol + 1).Value = concatStr
+
+End Sub
+
+
+Public Sub specialConcatCommas2()
+Dim lRow As Long
+Dim lCol As Long
+Dim concatCol As Long
+Dim concatStr As String
+Dim concatValue1 As String
+Dim concatRng As Range
+Dim concatValue As Variant
+
+concatCol = ActiveCell.Column
+
+lRow = Cells(Rows.Count, concatCol).End(xlUp).Row
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+
+If lRow < 2 Then
+    MsgBox "Please select a column with data.", vbOKOnly, "Invalid Column"
+    Exit Sub
+End If
+Set concatRng = Range(Cells(2, concatCol), Cells(lRow, concatCol))
+
+concatStr = ""
+For Each concatValue In concatRng
+    concatValue1 = Trim(concatValue)
+    If concatValue1 <> "" And concatValue1 <> "-1" Then
+        concatStr = concatStr & concatValue1 & ", "
+    End If
+Next concatValue
+
+concatStr = Left(concatStr, (Len(concatStr) - 2))
+
+Cells(1, lCol + 1).Value = concatStr
+
+End Sub
+
+
+Public Sub specialConcatSwitchingDatatypes()
+Dim lRow As Long
+Dim lCol As Long
+Dim concatCol As Long
+Dim concatStr As String
+Dim concatValue1 As String
+Dim concatRng As Range
+Dim concatValue As Variant
+
+concatCol = ActiveCell.Column
+
+lRow = Cells(Rows.Count, concatCol).End(xlUp).Row
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+
+If lRow < 2 Then
+    MsgBox "Please select a column with data.", vbOKOnly, "Invalid Column"
+    Exit Sub
+End If
+Set concatRng = Range(Cells(2, concatCol), Cells(lRow, concatCol))
+
+concatStr = ""
+For Each concatValue In concatRng
+    concatValue1 = Trim(concatValue)
+    If concatValue1 <> "" And concatValue1 <> "-1" Then
+        If WorksheetFunction.IsNumber(concatValue) = True Then
+            concatStr = concatStr & concatValue1 & ", "
+        Else
+            concatStr = concatStr & Chr(39) & concatValue1 & Chr(39) & ", "
+        End If
+    End If
+Next concatValue
+
+concatStr = Left(concatStr, (Len(concatStr) - 2))
+
+Cells(1, lCol + 1).Value = concatStr
+
+End Sub
+
+
+Public Sub specialConcatMultiColumns()
+Dim lRow As Long
+Dim lCol As Long
+Dim concatCol As Long
+Dim concatStr As String
+Dim concatValue1 As String
+Dim concatValue2 As String
+Dim concatRng As Range
+Dim concatValue As Variant
+
+concatCol = ActiveCell.Column
+
+lRow = Cells(Rows.Count, concatCol).End(xlUp).Row
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+
+If lRow < 2 Then
+    MsgBox "Please select a column with data.", vbOKOnly, "Invalid Column"
+    Exit Sub
+End If
+Set concatRng = Range(Cells(2, concatCol), Cells(lRow, concatCol))
+
+concatStr = ""
+For Each concatValue In concatRng
+    concatValue2 = concatValue.Offset(0, 1).Value
+    concatValue1 = Trim(concatValue)
+    concatValue2 = Trim(concatValue2)
+    If concatValue1 <> "" And concatValue1 <> "-1" Then
+        concatStr = concatStr & "(" & concatValue1 & ", " & concatValue2 & "), "
+    End If
+Next concatValue
+
+concatStr = Left(concatStr, (Len(concatStr) - 2))
+
+Cells(1, lCol + 1).Value = concatStr
+
+End Sub
+
+
+Public Function specialConcatMultiColumnsFun(concatColRng1 As Range, concatColRng2 As Range) As String
+Dim lRow As Long
+Dim concatCol1 As Long
+Dim concatCol2 As Long
+Dim concatStr As String
+Dim concatValue As Long
+
+concatCol1 = concatColRng1.Column
+concatCol2 = concatColRng2.Column
+
+lRow = Cells(Rows.Count, concatCol1).End(xlUp).Row
+
+concatStr = ""
+
+For concatValue = 2 To lRow
+    If Cells(concatValue, concatCol1).Value <> "" And Cells(concatValue, concatCol1).Value <> -1 Then
+        concatStr = concatStr & "(" & Trim(Cells(concatValue, concatCol1).Value) & ", " & Trim(Cells(concatValue, concatCol2).Value) & "), "
+    End If
+Next concatValue
+
+specialConcatMultiColumnsFun = Left(concatStr, (Len(concatStr) - 2))
+
+End Function
+
