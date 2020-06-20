@@ -1,0 +1,167 @@
+Status Bar
+
+Stored: PERESONNAL.xlsb
+
+Description: This set of macros is used to send information about a file to the status bar.
+
+-	checkHidden  - subroutine – returns the values of hidden columns and rows. if there are no hidden columns and rows, it returns “Nothing Hidden”
+-	autoFilterStatus - subroutine – returns the values of any columns that have the Auto Filter on.
+-	warningStatus – subroutine – returns the status of the Excel warnings.
+-	WhatColor – subroutine – returns the RGB value of the interior color of the selected cell.
+-	whatColumnNum – subroutine – returns the numerical value of the column of the selected column or cell.
+-	resetStatusBar – subroutine – reset the status bar.
+
+
+Public sub checkHidden()
+Dim lRow as Long
+Dim lCol As Long
+Dim cell As Range
+Dim rowRng As Range
+Dim colRng As Range
+Dim rowResult As String
+Dim colResult As String
+
+lRow = Cells(Rows.Count, "A").End(xlUp).Row
+lCol = Cells(1, columns.count).End(xlToLeft).Column
+
+Set rowRng = Range("A1:A" & lRow)
+
+For Each cell in rowRng
+  If cell.EntireRowHidden = True Then
+    rowResult = rowResult & cell.Row & ""
+  End if
+Next Cell
+
+Set colRng = Range(Cells(1,1), Cells(1, lCol))
+
+For each cell in colRng
+	If cell.EntireColumn.Hidden = true then
+		ColResult = colResult & split(cell.address(true, false), "$" (0) &  " "
+  End if
+Next cell
+
+statusOutput = ""
+
+If rowResult <> "" Then
+  statusOutput = "Row: " & rowResult
+End if
+
+If colResult <> "" Then
+  statusOutput = "Columns: " & colResult
+End if
+
+If statusOutput = "" Then
+  Application.StatusBar = "Nothing is Hidden."
+Else 
+  Application.StatusBar = "Hidden on " & statusOutput 
+End if
+
+End sub
+
+
+Public sub autoFilterStatus()
+Dim colFil As Long
+Dim colFilter As String
+Dim statusOutput As String
+Dim autoFilter As AutoFilter
+
+If ActiveSheet.AutoFilterMode = false Then
+  Application.StatusBar = False
+  Exit sub
+End if
+
+Set autoFilter = ActiveSheet.AutoFilter
+
+For colFil =1 to autoFilter.filters.count
+  If autoFilter.filters(colFil).On Then
+    colFilter = autoFilter.Range.Cells(1, colFIl).value
+    statusOutput = statusOutput & " | " & colFilter
+   End if
+Next colFil
+
+If statusOutput = "" Then
+  Application.StatusBar = "Nothing is filtered."
+Else 
+  Application.StatusBar = "Filtered on " & statusOutput 
+End if
+
+End sub
+
+
+Public sub warningStatus()
+Dim statusOutput As String
+
+If application.DisplayAlerts = True then
+	statusOutput = "Display Alerts: Yes | "
+ElseIf application.DisplayAlerts = False then
+	statusOutput = "Display Alerts: No | "
+End if
+
+If application.EnableEvents = True then
+	statusOutput = statusOutput & "Enable Events: Yes | "
+ElseIf application.DisplayAlerts = False then
+	statusOutput = statusOutput & "Enable Events: No | "
+End if
+
+If application.ScreenUpdating = True then
+	statusOutput = statusOutput & "Screen Updating: Yes | "
+ElseIf application.DisplayAlerts = False then
+	statusOutput = statusOutput & "ScreenUpdating: No | "
+End if
+
+Application.StatusBar = "Are they on?" & statusOutput
+
+End sub
+
+
+Public Sub WhatColor()
+	
+Dim  statusOutput As String
+Dim actRng As Range
+Dim redLevel As integer
+Dim greenLevel As integer
+Dim blueLevel As integer
+
+Set actRng = ActiveCell
+
+With actRng.Interior
+	redLevel = .Color Mod 256
+	greenLevel = (.Color Mod 256^ 2)\256
+	blueLevel = .Color \ (256 ^ 2)
+End With
+
+statusOutput = "(" & redLevel & ", " & greenLevel & ", " blueLevel & ")"
+
+If statusOutput =  "" Then
+  Application.statusBar = "There is no color."
+ElseIf application.DisplayAlerts = False then
+	Application.statusBar = "The RGB value " & statusOutput
+End if
+
+End sub
+
+
+Public Sub whatColumnNum()
+Dim statusOutput As String
+Dim colRng As Range
+Dim colNum As Long
+
+Set colRng = ActiveCell
+
+colNum = colRng.Column
+
+statusOutput = "Column number: " & colNum
+
+If statusOutput = "" Then
+    Application.StatusBar = "No column selected."
+Else
+    Application.StatusBar = statusOutput
+End If
+
+End Sub
+
+
+Public sub resetStatusBar()
+Application.statusBar = false
+End sub
+
