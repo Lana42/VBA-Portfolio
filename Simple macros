@@ -1,0 +1,94 @@
+Git Hub Simple Macros 
+
+Stored: PERESONNAL.xlsb
+
+Description: This set of macros are too simple to put into individual files
+
+
+'Compares two dates. Returns a statement based on the length of time between those dates.
+
+Public Function dateRange(SurgDate As Long, EventDate As Long) As String
+Dim daysElapsed As Long
+
+    daysElapsed = Abs(SurgDate - EventDate)
+    Select Case daysElapsed
+        Case Is = 0
+        dateRange = "Exact match."
+        Case Is <= 3
+        dateRange = "Within a few days."
+        Case Is <= 7
+        dateRange = "Within a week."
+        Case Is <= 14
+        dateRange = "Within a couple weeks."
+        Case Is <= 30
+        dateRange = "Within a month."
+        Case Else
+        dateRange = "Greater than a month."
+    End Select
+    
+End Function
+
+
+'Assigns an age range for a given range.
+
+Public Function ageRange(Age As Long) As String
+
+Dim prefix As Integer
+
+prefix = Application.WorksheetFunction.Floor(Age * 0.1, 1)
+ageRange = prefix & "0 - " & prefix & "9"
+
+End Function
+
+
+‘Cleans up inconsistent data. Removes the last character of list if it is a letter. Removes dashes from the values.
+
+Public Sub removeLetter()
+Dim lRow As Long
+Dim trimLChar As Long
+Dim currentCol As Long
+Dim asciiNum As Long
+Dim currentRng As Range
+Dim cellVal As String
+Dim lChar As String
+
+lRow = Cells(Rows.Count, "A").End(xlUp).Row
+
+Set currentRng = ActiveCell
+
+currentCol = currentRng.Column
+
+For trimLChar = 2 To lRow
+    lChar = Right(Cells(trimLChar, currentCol), 1)
+    asciiNum = Asc(UCase(lChar))
+    If (asciiNum > 64 And asciiNum < 91) Then
+        cellVal = Cells(trimLChar, currentCol).Value
+        cellVal = Left(cellVal, Len(cellVal) - 1)
+    End If
+    cellVal = Replace(cellVal, "-", "")
+    Cells(trimLChar, currentCol).Value = cellVal
+Next trimLChar
+
+End Sub
+
+
+‘Rearranges a date format YYYYMMDD. This is not one of the standards in excel and it does not recognize it as a date
+
+Public sub rearrangeDate1()
+Dim lRow As Long
+Dim rearrDate As Long
+Dim currentCol As Long
+Dim cellVal As String
+
+currentCol = ActiveCell.Column
+
+lRow = Cells(Rows.Count, “A”).End(xlUp).Row
+
+For rearrDate = 2 To lRow
+  cellVal = Cells(rearrDate, currentCol).Value
+  cellVal = Mid(cellVal, 5, 2) & “/” & Right(cellVal, 2) & “/” & Left(cellVal, 4)
+  Cells(rearrDate, currentCol).Value = cellVal
+Next rearrDate
+
+End sub
+
