@@ -1,0 +1,147 @@
+Git Hub Split data and append data 
+
+Stored: PERESONNAL.xlsb
+
+Description: This set of macros splits a list of data by a set number. A header is created to give details about the first and last values in each individual list.
+
+
+‘Splits a single list of data into groups of 50. 
+
+Public Sub splitData()
+Dim lRow As Long
+Dim curCol As Long
+Dim divNum As Long
+Dim totalVal As Long
+Dim divCol As Long
+Dim prefixVal As String
+Dim prefixVal2 As String
+Dim newPrefix As String
+
+lRow = Cells(Rows.Count, "A").End(xlUp).Row
+curCol = 1
+totalVal = 51
+divNum = WorksheetFunction.Floor((lRow / totalVal), 1)
+
+‘Splits the data by increments of 50
+For divCol = 1 To divNum
+    Range(Cells(totalVal + 1, curCol), Cells(lRow, curCol)).Cut Destination:=Range(Cells(2, curCol + 1), Cells(lRow - (totalVal + 1), curCol + 1))
+    curCol = curCol + 1
+    lRow = Cells(Rows.Count, curCol).End(xlUp).Row
+Next divCol
+
+‘Creates a prefix from the value in A1
+prefixVal = Range("A1").Value
+
+‘Creates a header with the starting value and end value of each new column
+For divCol = 1 To (divNum + 1)
+    lRow = Cells(Rows.Count, divCol).End(xlUp).Row
+    Cells(1, divCol).Value = prefixVal & ": " & Cells(2, divCol).Value & " thru " & Cells(lRow, divCol).Value
+Next divCol
+
+End Sub
+
+
+‘Combines lists of data into a single column. Creates a header with the first value and the last value
+
+Public Sub combineData()
+Dim lRow As Long
+Dim lCol As Long
+Dim rowVal As Long
+Dim concatCol As Long
+Dim newRow As Long
+Dim resultCol As Long
+
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+resultCol = lCol + 1
+
+‘Brings in a copy of each value  into a new column
+For concatCol = 1 To lCol
+    lRow = Cells(Rows.Count, concatCol).End(xlUp).Row
+    newRow = Cells(Rows.Count, resultCol).End(xlUp).Row + 1
+    For rowVal = 2 To lRow
+        Cells(newRow, resultCol).Value = Cells(rowVal, concatCol).Value
+        newRow = newRow + 1
+    Next rowVal
+    
+Next concatCol
+
+‘Creates a header with the first value and the last value of the column
+ lRow = Cells(Rows.Count, resultCol).End(xlUp).Row
+ Cells(1, resultCol).Value = Cells(2, resultCol).Value & " thru " & Cells(lRow, resultCol).Value
+ 
+End Sub
+
+
+‘Splits data from 2 columns in pairs by 50
+
+Public Sub splitDataMulti()
+Dim lRow As Long
+Dim curCol As Long
+Dim divNum As Long
+Dim totalVal As Long
+Dim divCol As Long
+Dim prefixVal As String
+Dim prefixVal2 As String
+Dim newPrefix As String
+
+lRow = Cells(Rows.Count, "A").End(xlUp).Row
+curCol = 1
+totalVal = 51
+divNum = WorksheetFunction.Floor((lRow / totalVal), 1)
+
+‘Splits the 2 columns of data 
+For divCol = 1 To divNum
+    Range(Cells(totalVal + 1, curCol), Cells(lRow, curCol + 1)).Cut Destination:=Range(Cells(2, curCol + 2), Cells(lRow - (totalVal + 1), curCol + 3))
+    curCol = curCol + 2
+    lRow = Cells(Rows.Count, curCol).End(xlUp).Row
+Next divCol
+
+‘capture both header columns
+prefixVal = Range("A1").Value
+prefixVal2 = Range("B1").Value
+
+‘Creates new header for each column with the starting value and end value 
+For divCol = 1 To ((divNum * 2) + 2)
+    lRow = Cells(Rows.Count, divCol).End(xlUp).Row
+        If WorksheetFunction.IsEven(divCol) = False Then
+            newPrefix = prefixVal
+        Else
+            newPrefix = prefixVal2
+        End If
+    Cells(1, divCol).Value = newPrefix & ": " & Cells(2, divCol).Value & " thru " & Cells(lRow, divCol).Value
+Next divCol
+
+End Sub
+
+
+‘Combines lists of data pairs into 2 complementary columns.
+‘Creates a header for each new columnwith the first value and the last value
+
+Public Sub combineDataMulti()
+Dim lRow As Long
+Dim lCol As Long
+Dim rowVal As Long
+Dim concatCol As Long
+Dim newRow As Long
+Dim resultCol As Long
+
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+resultCol = lCol + 1
+
+‘Brings in a copy of each value  into a new column for both of the new columns
+For concatCol = 1 To lCol Step 2
+    lRow = Cells(Rows.Count, "A").End(xlUp).Row
+    newRow = Cells(Rows.Count, resultCol).End(xlUp).Row + 1
+    For rowVal = 2 To lRow
+        Cells(newRow, resultCol).Value = Cells(rowVal, concatCol).Value
+        Cells(newRow, resultCol + 1).Value = Cells(rowVal, concatCol + 1).Value
+        newRow = newRow + 1
+    Next rowVal
+Next concatCol
+
+‘Creates a header with the first value and the last value of the column for each column
+lRow = Cells(Rows.Count, resultCol).End(xlUp).Row
+Cells(1, resultCol).Value = Cells(2, resultCol).Value & " thru " & Cells(lRow, resultCol).Value
+Cells(1, resultCol + 1).Value = Cells(2, resultCol + 1).Value & " thru " & Cells(lRow, resultCol + 1).Value
+
+End Sub
