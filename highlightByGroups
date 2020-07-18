@@ -1,0 +1,78 @@
+Git Hub Highlight by groups 
+
+Stored: PERESONNAL.xlsb
+File accompaning this macro: Highlight by groups mock data
+
+Description: This set of macros highlight by groups of data, (e.i. customer numbers, patient ids, order numbers)
+
+Public Sub highlightByGroups()
+
+Dim lRow As Long
+Dim lCol As Long
+Dim keyStartRow As Long
+Dim keyEndRow As Long
+Dim keyColumn As Long
+Dim interiorSet As Long
+Dim HighlightColor As Long
+Dim keyValue As Range
+Dim specialValue As String
+
+stopAll
+
+‘Sorts the columns
+Range("A1").CurrentRegion.Sort Key1:=Range("A1"), Order1:=xlAscending, Key2:=Range("B1"), Order2:=xlAscending, _
+Key3:=Range("C1"), Order3:=xlAscending, Header:=xlYes
+
+lRow = Cells(Rows.Count, "A").End(xlUp).Row
+lCol = Cells(1, Columns.Count).End(xlToLeft).Column
+
+‘finds the customer number column 
+Set keyValue = Range("1:1").Find(What:="Customer", LookIn:=xlValues)
+keyColumn = keyValue.Column
+
+‘Sets the interior color to a blank cell. This may be set up differently for different instances of excel.
+interiorSet = keyValue.Interior.Color
+HighlightColor = RGB(170, 200, 225)
+specialValue = ""
+
+‘Goes through each cell in the customer number  column. When the number changes, the highlight color for that customer number block 
+'will be evaluated and the opposite highlight color from the previse set will be applied.
+For keyStartRow = 2 To lRow
+    If specialValue <> Cells(keyStartRow, keyColumn).Value Then
+    specialValue = Cells(keyStartRow, keyColumn).Value
+    
+    keyEndRow = WorksheetFunction.CountIf(Columns(keyColumn), Cells(keyStartRow, keyColumn).Value)
+        If Cells((keyStartRow - 1), keyColumn).Interior.Color = interiorSet Then
+            Range(Cells(keyStartRow, 1), Cells((keyStartRow + keyEndRow - 1), lCol)).Interior.Color = HighlightColor
+        Else
+            Range(Cells(keyStartRow, 1), Cells((keyStartRow + keyEndRow - 1), lCol)).Interior.Color = interiorSet
+        End If
+    End If
+    
+Next keyStartRow
+
+With Range(Cells(1, 1), Cells(lRow, lCol)).Borders
+    .LineStyle = xlContinuous
+    .Weight = xlThin
+    .Color = RGB(200, 200, 200)
+End With
+
+startAll
+End Sub
+
+'Used to stop all automatic excel updating events to speed programs as well as keeping it from stopping for updates.
+
+Public Sub stopAll()
+Application.ScreenUpdating = False
+Application.EnableEvents = False
+Application.DisplayAlerts = False
+End Sub
+
+
+'Restarts all event handling. it is imparative to use the start all if they have been stopped.
+
+Public Sub startAll()
+Application.ScreenUpdating = True
+Application.EnableEvents = True
+Application.DisplayAlerts = True
+End Sub
